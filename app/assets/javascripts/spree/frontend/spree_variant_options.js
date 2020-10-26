@@ -1,7 +1,6 @@
 //= require spree/frontend
 //= require extentions/array
 //= require extentions/global_methods
-
 var SpreeVariantOption = {}
 SpreeVariantOption.OptionValuesHandler = function(selectors) {
   this.optionsButton = selectors.optionsButton;
@@ -19,9 +18,8 @@ SpreeVariantOption.OptionValuesHandler = function(selectors) {
 SpreeVariantOption.OptionValuesHandler.prototype.init = function() {
   this.bindEvents();
   this.optionsButton.filter('[data-level!=1]').addClass('locked').removeClass('selected');
-  if(this.optionsButton.length != 0) {
-    this.disableCartInputFields(true);
-  }
+  this.unlockNextLevel(this.optionsButton.filter('[data-level=1]'), true);
+  this.disableCartInputFields(true);
 };
 
 SpreeVariantOption.OptionValuesHandler.prototype.bindEvents = function() {
@@ -106,7 +104,6 @@ SpreeVariantOption.OptionValuesHandler.prototype.anyVariantExists = function(con
 SpreeVariantOption.OptionValuesHandler.prototype.setVariantId = function(is_exist) {
   if(is_exist) {
     this.variantField.val(this.variantId);
-    console.log(this);
     this.priceHeading.html("<b>RRP: </b>" + this.variantPrice + "&emsp;<b>Club Price:</b> " + this.clubPrice);
   } else {
     this.variantField.val('');
@@ -114,16 +111,24 @@ SpreeVariantOption.OptionValuesHandler.prototype.setVariantId = function(is_exis
   }
 };
 
-SpreeVariantOption.OptionValuesHandler.prototype.unlockNextLevel = function(optionValue) {
-  var allOptionValues = optionValue.closest('.variant-options').next().find('.option-value'),
-      availableOptionValueCount = 0,
-      availableOptionValue,
-      _this = this,
-      details;
+SpreeVariantOption.OptionValuesHandler.prototype.unlockNextLevel = function(optionValue, firstLevel) {
+  if ( firstLevel == null ) firstLevel = false;
+
+  var allOptionValues = optionValue.closest('.variant-options'),
+    availableOptionValueCount = 0,
+    availableOptionValue,
+    _this = this,
+    details;
+
+  if ( firstLevel == true ){
+    allOptionValues = allOptionValues.find('.option-value');
+  } else {
+    allOptionValues = allOptionValues.next().find('.option-value');
+  }
 
   allOptionValues.each(function() {
     var $this = $(this),
-        conditions = {};
+      conditions = {};
 
     conditions[$(this).data('typeId')] = $(this).data('valueId');
     details = _this.anyVariantExists(conditions);
@@ -132,12 +137,12 @@ SpreeVariantOption.OptionValuesHandler.prototype.unlockNextLevel = function(opti
       availableOptionValueCount += 1;
       availableOptionValue = $this;
       if(($this.data('level') == options["option_type_count"]) && !details["inStock"] && !options["allow_select_outofstock"]) {
-        $this.addClass('out-of-stock');
+        $this.addClass('out-of-stock locked');
       } else {
         $this.removeClass('out-of-stock locked');
       }
     } else {
-      $this.removeClass('out-of-stock');
+      $this.removeClass('out-of-stock locked');
     }
   });
 
@@ -148,7 +153,7 @@ SpreeVariantOption.OptionValuesHandler.prototype.unlockNextLevel = function(opti
 
 SpreeVariantOption.OptionValuesHandler.prototype.setVariantWithSelecetedValues = function() {
   var conditions = {},
-      _this = this;
+    _this = this;
   this.variantId = 0;
   this.setComparingConditions(conditions);
 
