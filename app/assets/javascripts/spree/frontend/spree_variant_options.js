@@ -59,10 +59,12 @@ SpreeVariantOption.OptionValuesHandler.prototype.clearButtonClickHandler = funct
 };
 
 SpreeVariantOption.OptionValuesHandler.prototype.disableCartInputFields = function(value) {
-  this.addToCartButton.prop('disabled', value);
-  this.quantityField.prop('disabled', value);
+  if(this.optionsButton.length > 0) {
+    this.addToCartButton.prop('disabled', value);
+    this.quantityField.prop('disabled', value);
 
-  if(value) { this.priceHeading.html('Select size/colour to see pricing'); }
+    if(value) { this.priceHeading.html('Select size/colour to see pricing'); }
+  }
 };
 
 SpreeVariantOption.OptionValuesHandler.prototype.updateSiblings = function(optionValue) {
@@ -103,8 +105,10 @@ SpreeVariantOption.OptionValuesHandler.prototype.anyVariantExists = function(con
 
 SpreeVariantOption.OptionValuesHandler.prototype.setVariantId = function(is_exist) {
   if(is_exist) {
+    var clubPrice = this.clubPrice == '$0.00' ? '' : '&emsp;<b>Club Price:</b> ' + this.clubPrice;
+
     this.variantField.val(this.variantId);
-    this.priceHeading.html("<b>RRP: </b>" + this.variantPrice + "&emsp;<b>Club Price:</b> " + this.clubPrice);
+    this.priceHeading.html('<b>RRP: </b>' + this.variantPrice + clubPrice);
   } else {
     this.variantField.val('');
     this.priceHeading.html('Select size/colour to see pricing');
