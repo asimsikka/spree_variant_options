@@ -1,3 +1,6 @@
+gem_dir = Gem::Specification.find_by_name("spree_related_products").gem_dir
+require "#{gem_dir}/app/models/spree/product_decorator.rb"
+
 Spree::Product.class_eval do
 
   has_many :option_values, through: :variants

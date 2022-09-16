@@ -1,4 +1,4 @@
-class AddImageToOptionValues < ActiveRecord::Migration
+class AddImageToOptionValues < ActiveRecord::Migration[Rails.version.gsub(Rails.version.match(/\..(\..*$)/).captures.last , '')]
   def change
     add_column :spree_option_values, :image_file_name,    :string
     add_column :spree_option_values, :image_content_type, :string
