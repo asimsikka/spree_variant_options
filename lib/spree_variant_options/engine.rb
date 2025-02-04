@@ -6,13 +6,13 @@ module SpreeVariantOptions
     config.to_prepare do
       #loads application's model / class decorators
       Dir.glob(File.join(File.dirname(__FILE__), "../../app/**/*_decorator*.rb")) do |c|
-        Rails.application.config.cache_classes ? require(c) : load(c)
+        load(c) if File.file?(c)
       end
     end
 
     initializer "spree_variant_options.environment", :before => :load_config_initializers, :after => "spree.environment" do |app|
       Dir.glob(File.join(File.dirname(__FILE__), "../../app/models/spree/app_configuration/*.rb")) do |c|
-        Rails.application.config.cache_classes ? require(c) : load(c)
+        load(c) if File.file?(c)
       end
       app.config.spree.class.include(SpreeVariantOptions::EnvironmentExtension)
       app.config.spree.add_class('variant_preferences')
